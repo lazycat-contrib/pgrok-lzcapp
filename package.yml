@@ -1,4 +1,5 @@
 package: community.lazycat.app.pgrok
+license: MIT
 version: 1.7.0
 name: pgrok
 description: 自托管安全隧道服务
@@ -14,4 +15,4 @@ locales:
     description: pgrok self-hosted service
 permissions:
   required:
-  - net.internet
+    - net.internet
