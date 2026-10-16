@@ -1,0 +1,17 @@
+package: community.lazycat.app.pgrok
+version: 1.7.0
+name: pgrok
+description: 自托管安全隧道服务
+min_os_version: 1.5.0
+homepage: https://github.com/pgrok/pgrok
+author: pgrok
+locales:
+  zh:
+    name: pgrok
+    description: 自托管安全隧道服务
+  en:
+    name: pgrok
+    description: pgrok self-hosted service
+permissions:
+  required:
+  - net.internet

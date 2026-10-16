@@ -1,0 +1,22 @@
+params:
+- id: proxy_domain
+  type: string
+  name: Tunnel wildcard domain
+  description: Wildcard DNS domain pointing at this device, including :3000 if using
+    direct port 3000. No quotes or line breaks.
+  optional: false
+- id: oidc_issuer
+  type: string
+  name: OIDC issuer URL
+  description: An existing OIDC provider issuer URL. No quotes or line breaks.
+  optional: false
+- id: oidc_client_id
+  type: string
+  name: OIDC client ID
+  description: Client ID from your OIDC provider. No quotes or line breaks.
+  optional: false
+- id: oidc_client_secret
+  type: secret
+  name: OIDC client secret
+  description: Client secret from your OIDC provider. No quotes or line breaks.
+  optional: false
