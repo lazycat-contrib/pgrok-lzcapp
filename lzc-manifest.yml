@@ -1,54 +1,46 @@
 application:
   subdomain: pgrok
   public_path:
-  - /
+    - /
   upstreams:
-  - location: /
-    backend: http://pgrok:3320/
+    - location: /
+      backend: http://pgrok:3320/
   injects:
-  - id: open-save-chooser
-    'on': browser
-    when:
-    - /*
-    do:
-    - src: file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
+    - id: open-save-chooser
+      'on': browser
+      when:
+        - /*
+      do:
+        - src: file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
   ingress:
-  - protocol: tcp
-    port: 2222
-    service: pgrok
-  - protocol: tcp
-    port: 3000
-    service: pgrok
+    - protocol: tcp
+      port: 2222
+      service: pgrok
+    - protocol: tcp
+      port: 3000
+      service: pgrok
 services:
   pgrok:
+    # upstream: ghcr.io/pgrok/pgrokd:1.7.0
     image: ghcr.1ms.run/pgrok/pgrokd:1.7.0
     binds:
-    - /lzcapp/var/pgrok:/var/opt/pgrokd
+      - /lzcapp/var/pgrok:/var/opt/pgrokd
     environment:
-    - EXTERNAL_URL=https://{{ .S.AppDomain }}
-    - PROXY_DOMAIN={{ .U.proxy_domain }}
-    - OIDC_ISSUER={{ .U.oidc_issuer }}
-    - OIDC_CLIENT_ID={{ .U.oidc_client_id }}
-    - OIDC_CLIENT_SECRET={{ .U.oidc_client_secret }}
-    - DB_PASSWORD={{ stable_secret "pgrok_database_password" }}
+      - EXTERNAL_URL=https://{{ .S.AppDomain }}
+      - PROXY_DOMAIN={{ .U.proxy_domain }}
+      - OIDC_ISSUER={{ .U.oidc_issuer }}
+      - OIDC_CLIENT_ID={{ .U.oidc_client_id }}
+      - OIDC_CLIENT_SECRET={{ .U.oidc_client_secret }}
+      - DB_PASSWORD={{ stable_secret "pgrok_database_password" }}
     depends_on:
-    - postgres
-    setup_script: "mkdir -p /var/opt/pgrokd\numask 077\ncat > /var/opt/pgrokd/pgrokd.yml\
-      \ <<EOF\nexternal_url: \"$EXTERNAL_URL\"\nweb:\n  port: 3320\nproxy:\n  port:\
-      \ 3000\n  scheme: \"http\"\n  domain: \"$PROXY_DOMAIN\"\nsshd:\n  port: 2222\n\
-      database:\n  host: \"postgres\"\n  port: 5432\n  user: \"pgrok\"\n  password:\
-      \ \"$DB_PASSWORD\"\n  database: \"pgrokd\"\nidentity_provider:\n  type: \"oidc\"\
-      \n  display_name: \"OIDC\"\n  issuer: \"$OIDC_ISSUER\"\n  client_id: \"$OIDC_CLIENT_ID\"\
-      \n  client_secret: \"$OIDC_CLIENT_SECRET\"\n  field_mapping:\n    identifier:\
-      \ \"sub\"\n    display_name: \"name\"\n    email: \"email\"\nEOF\nchown -R 10000:10001\
-      \ /var/opt/pgrokd\n"
+      - postgres
+    setup_script: "mkdir -p /var/opt/pgrokd\numask 077\ncat > /var/opt/pgrokd/pgrokd.yml <<EOF\nexternal_url: \"$EXTERNAL_URL\"\nweb:\n  port: 3320\nproxy:\n  port: 3000\n  scheme: \"http\"\n  domain: \"$PROXY_DOMAIN\"\nsshd:\n  port: 2222\ndatabase:\n  host: \"postgres\"\n  port: 5432\n  user: \"pgrok\"\n  password: \"$DB_PASSWORD\"\n  database: \"pgrokd\"\nidentity_provider:\n  type: \"oidc\"\n  display_name: \"OIDC\"\n  issuer: \"$OIDC_ISSUER\"\n  client_id: \"$OIDC_CLIENT_ID\"\n  client_secret: \"$OIDC_CLIENT_SECRET\"\n  field_mapping:\n    identifier: \"sub\"\n    display_name: \"name\"\n    email: \"email\"\nEOF\nchown -R 10000:10001 /var/opt/pgrokd\n"
   postgres:
     image: docker.1ms.run/library/postgres:16-alpine
     environment:
-    - POSTGRES_DB=pgrokd
-    - POSTGRES_USER=pgrok
-    - POSTGRES_PASSWORD={{ stable_secret "pgrok_database_password" }}
+      - POSTGRES_DB=pgrokd
+      - POSTGRES_USER=pgrok
+      - POSTGRES_PASSWORD={{ stable_secret "pgrok_database_password" }}
     binds:
-    - /lzcapp/var/postgres:/var/lib/postgresql/data
-usage: 安装时必须填写可用的 OIDC 身份提供方与通配隧道域名。管理界面通过 OIDC 登录；TCP 2222 为 SSH 隧道入口，3000 为 HTTP
-  隧道入口，均需用户自行配置网络可达性和通配 DNS。不提供任意 TCP 端口范围转发。数据库密码自动生成并稳定保存。配置文件按安装参数重建，勿直接编辑运行目录。
+      - /lzcapp/var/postgres:/var/lib/postgresql/data
+usage: 安装时必须填写可用的 OIDC 身份提供方与通配隧道域名。管理界面通过 OIDC 登录；TCP 2222 为 SSH 隧道入口，3000 为 HTTP 隧道入口，均需用户自行配置网络可达性和通配 DNS。不提供任意 TCP 端口范围转发。数据库密码自动生成并稳定保存。配置文件按安装参数重建，勿直接编辑运行目录。
