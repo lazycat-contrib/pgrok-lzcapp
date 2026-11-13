@@ -1,6 +1,6 @@
 package: community.lazycat.app.pgrok
 license: MIT
-version: 1.7.0
+version: 1.8.0
 name: pgrok
 description: 自托管安全隧道服务
 min_os_version: 1.5.0
